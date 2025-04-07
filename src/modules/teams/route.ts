@@ -1,11 +1,12 @@
 import { Hono } from 'hono'
 
-const app = new Hono()
+import { sessionMiddleware } from '../auth/sessionMiddleware'
 
-app.get('/', (c) => {
-  return c.json({
-    message: 'Hello from teams route!',
+const app = new Hono()
+  .get('/', sessionMiddleware, (c) => {
+    return c.json({
+      message: 'Hello from teams route!',
+    })
   })
-})
 
 export default app
