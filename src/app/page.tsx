@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
+import { getTeams } from "@/modules/teams/queries";
 import { redirect } from "next/navigation";
 
 export default async function Home() {
@@ -8,11 +8,12 @@ export default async function Home() {
   if (!session || !session.user) {
     redirect("/login");
   }
-  
-  return (
-    <div>
-      <h1>Hello NextJS + Shadcn-UI</h1>
-      <Button>Fui Feito com Shadcn</Button>
-    </div>
-  );
+
+  const teams = await getTeams(session.user.id as string);
+
+  if (teams.length === 0) {
+    redirect("/time/criar");
+  } else {
+    redirect(`/time/${teams[0].id}`);
+  }
 }
