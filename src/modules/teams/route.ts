@@ -21,13 +21,14 @@ const app = new Hono()
     async (c) => {
       const user = c.get('user')
 
-      const { name } = c.req.valid('json')
+      const { name, image } = c.req.valid('json')
 
       const team = await prisma.team.create({
         data: {
           name,
           userId: user.id as string,
-          inviteCode: 'abc123'
+          inviteCode: 'abc123',
+          image: image as string
         }
       })
 
