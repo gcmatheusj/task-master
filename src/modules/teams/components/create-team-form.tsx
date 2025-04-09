@@ -12,6 +12,8 @@ import { useRef } from 'react'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
+import { useCreateTeam } from '../hooks/use-create-team'
+import { useRouter } from 'next/navigation'
 
 type CreateTeamForm = z.infer<typeof createTeamSchema>
 
@@ -23,9 +25,29 @@ export function CreateTeamForm () {
     },
     resolver: zodResolver(createTeamSchema)
   })
+  const { mutate, isPending } = useCreateTeam()
+  const router = useRouter()
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+
+    if (file) {
+      form.setValue('image', file)
+    }
+  }
 
   const onSubmit = async (data: CreateTeamForm) => {
-    console.log(data)
+    mutate({
+      json: {
+        name: data.name,
+        image: ''
+      }
+    }, {
+      onSuccess: ({ data }) => {
+        form.reset()
+        router.push(`/time/${data.id}`)
+      }
+    })
   }
 
   return (
@@ -71,6 +93,8 @@ export function CreateTeamForm () {
                         type='file'
                         className='hidden'
                         accept='.jpeg, .jpg, .png, .svg'
+                        onChange={handleFileChange}
+                        disabled={isPending}
                       />
                     </div>
                   </div>
@@ -116,6 +140,7 @@ export function CreateTeamForm () {
                 size='lg'
                 type='submit'
                 onClick={() => {}}
+                disabled={isPending}
               >
                 Criar Time
               </Button>
