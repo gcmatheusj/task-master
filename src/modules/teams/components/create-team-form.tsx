@@ -15,10 +15,15 @@ import { Button } from '@/components/ui/button'
 import { useCreateTeam } from '../hooks/use-create-team'
 import { useRouter } from 'next/navigation'
 import { usePresignedFile } from '@/modules/files/hooks/use-presigned-file'
+import { cn } from '@/lib/utils'
 
 type CreateTeamForm = z.infer<typeof createTeamSchema>
 
-export function CreateTeamForm () {
+interface CreateTeamFormProps {
+  onCancel?: () => void
+}
+
+export function CreateTeamForm ({ onCancel }: CreateTeamFormProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const form = useForm<CreateTeamForm>({
     defaultValues: {
@@ -156,10 +161,11 @@ export function CreateTeamForm () {
 
             <div className='flex items-center justify-end gap-2'>
               <Button
+                className={cn(!onCancel && 'invisible')}
                 variant='secondary'
                 size='lg'
                 type='button'
-                onClick={() => {}}
+                onClick={onCancel}
               >
                 Cancelar
               </Button>
