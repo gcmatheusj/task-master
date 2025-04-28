@@ -1,10 +1,9 @@
 'use client'
 import { z } from 'zod'
 
-import { createTeamSchema } from '../schemas/create-team'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import Image from 'next/image'
@@ -12,28 +11,28 @@ import { useRef } from 'react'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
-import { useCreateTeam } from '../hooks/use-create-team'
-import { useRouter } from 'next/navigation'
 import { usePresignedFile } from '@/modules/files/hooks/use-presigned-file'
-import { cn } from '@/lib/utils'
+import { updateTeamSchema } from '../schemas/update-team'
+import { useUpdateTeam } from '../hooks/use-update-team'
+import { Team } from '@prisma/client'
 
-type CreateTeamForm = z.infer<typeof createTeamSchema>
+type UpdateTeamForm = z.infer<typeof updateTeamSchema>
 
-interface CreateTeamFormProps {
-  onCancel?: () => void
+interface UpdateTeamFormProps {
+  initialData: Team
 }
 
-export function CreateTeamForm ({ onCancel }: CreateTeamFormProps) {
+export function UpdateTeamForm ({ initialData }: UpdateTeamFormProps) {
   const inputRef = useRef<HTMLInputElement>(null)
-  const form = useForm<CreateTeamForm>({
+  const form = useForm<UpdateTeamForm>({
     defaultValues: {
-      name: ''
+      name: initialData?.name,
+      image: initialData?.image as string
     },
-    resolver: zodResolver(createTeamSchema)
+    resolver: zodResolver(updateTeamSchema)
   })
-  const { mutate, isPending } = useCreateTeam()
+  const { mutate, isPending } = useUpdateTeam()
   const { mutateAsync: presignFile } = usePresignedFile()
-  const router = useRouter()
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -43,7 +42,7 @@ export function CreateTeamForm ({ onCancel }: CreateTeamFormProps) {
     }
   }
 
-  const onSubmit = async (data: CreateTeamForm) => {
+  const onSubmit = async (data: UpdateTeamForm) => {
     let image: string | undefined = undefined
 
     if (data.image instanceof File) {
@@ -74,21 +73,24 @@ export function CreateTeamForm ({ onCancel }: CreateTeamFormProps) {
       json: {
         name: data.name,
         image
-      }
-    }, {
-      onSuccess: ({ data }) => {
-        form.reset()
-        router.push(`/time/${data.id}`)
+      },
+      param: {
+        teamId: initialData.id
       }
     })
   }
 
+  const name = form.watch('name')
+
   return (
     <Card className='w-full h-full'>
-      <CardHeader className='flex px-7'>
+      <CardHeader className='flex flex-col px-7'>
         <CardTitle className='text-xl font-bold'>
-          Crie um novo time
+          Geral
         </CardTitle>
+        <CardDescription>
+          Configure as informações do time
+        </CardDescription>
       </CardHeader>
 
       <CardContent className='px-7'>
@@ -116,7 +118,7 @@ export function CreateTeamForm ({ onCancel }: CreateTeamFormProps) {
                             className='text-white text-3xl rounded-none bg-yellow-500'
                             onClick={() => inputRef.current?.click()}
                           >
-                            {form.watch('name') ? form.watch('name')[0].toUpperCase() : 'T'}
+                            {name ? name[0].toUpperCase() : 'T'}
                           </AvatarFallback>
                         </Avatar>
                       )}
@@ -161,22 +163,11 @@ export function CreateTeamForm ({ onCancel }: CreateTeamFormProps) {
 
             <div className='flex items-center justify-end gap-2'>
               <Button
-                className={cn(!onCancel && 'invisible')}
-                variant='secondary'
-                size='lg'
-                type='button'
-                onClick={onCancel}
-              >
-                Cancelar
-              </Button>
-
-              <Button
                 size='lg'
                 type='submit'
-                onClick={() => {}}
                 disabled={isPending}
               >
-                Criar Time
+                Salvar Alterações
               </Button>
             </div>
           </form>

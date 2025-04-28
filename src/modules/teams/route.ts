@@ -4,6 +4,7 @@ import { zValidator } from '@hono/zod-validator'
 
 import { sessionMiddleware } from '../auth/sessionMiddleware'
 import { createTeamSchema } from './schemas/create-team'
+import { updateTeamSchema } from './schemas/update-team'
 
 import { prisma } from '@/lib/prisma'
 import { MemberRole } from '@prisma/client'
@@ -52,6 +53,44 @@ const app = new Hono()
           userId: user.id as string,
           teamId: team.id,
           role: MemberRole.ADMIN
+        }
+      })
+
+      return c.json({
+        data: team
+      })
+    }
+  )
+  .patch(
+    '/:teamId',
+    sessionMiddleware,
+    zValidator('json', updateTeamSchema),
+    async (c) => {
+      const user = c.get('user')
+
+      const { teamId } = c.req.param()
+      const { name, image } = c.req.valid('json')
+
+      const member = await prisma.member.findFirst({
+        where: {
+          userId: user.id as string,
+          teamId
+        }
+      })
+
+      if (!member || member.role !== MemberRole.ADMIN) {
+        return c.json({
+          message: 'Você não tem permissão para editar este time'
+        }, 403)
+      }
+
+      const team = await prisma.team.update({
+        where: {
+          id: teamId
+        },
+        data: {
+          name,
+          image: image as string
         }
       })
 
