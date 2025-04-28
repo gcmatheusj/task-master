@@ -1,11 +1,12 @@
 import { TeamNavigation } from "@/modules/teams/components/team-navigation";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from "./ui/sidebar";
+import { TeamsSwitcher } from "@/modules/teams/components/teams-switcher";
 
 export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
-        <span>Task Master</span>
+        <TeamsSwitcher />
       </SidebarHeader>
 
       <SidebarContent>

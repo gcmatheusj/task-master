@@ -9,9 +9,24 @@ import { prisma } from '@/lib/prisma'
 import { MemberRole } from '@prisma/client'
 
 const app = new Hono()
-  .get('/', sessionMiddleware, (c) => {
+  .get('/', sessionMiddleware, async (c) => {
+    const user = c.get('user')
+
+    const members = await prisma.member.findMany({
+      where: {
+        userId: user.id as string
+      },
+      include: {
+        team: true
+      }
+    })
+
+    const teams = members.map(member => ({
+      ...member.team
+    }))
+
     return c.json({
-      message: 'Hello from teams route!',
+      data: teams
     })
   })
   .post(
