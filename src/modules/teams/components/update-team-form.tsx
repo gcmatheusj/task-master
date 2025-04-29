@@ -15,6 +15,9 @@ import { usePresignedFile } from '@/modules/files/hooks/use-presigned-file'
 import { updateTeamSchema } from '../schemas/update-team'
 import { useUpdateTeam } from '../hooks/use-update-team'
 import { Team } from '@prisma/client'
+import { DeleteTeamDialog } from './delete-team-dialog'
+import { useDeleteTeam } from '../hooks/use-delete-team'
+import { useRouter } from 'next/navigation'
 
 type UpdateTeamForm = z.infer<typeof updateTeamSchema>
 
@@ -32,7 +35,9 @@ export function UpdateTeamForm ({ initialData }: UpdateTeamFormProps) {
     resolver: zodResolver(updateTeamSchema)
   })
   const { mutate, isPending } = useUpdateTeam()
+  const { mutateAsync: deleteTeam, isPending: isDeletingTeam } = useDeleteTeam()
   const { mutateAsync: presignFile } = usePresignedFile()
+  const router = useRouter()
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -40,6 +45,18 @@ export function UpdateTeamForm ({ initialData }: UpdateTeamFormProps) {
     if (file) {
       form.setValue('image', file)
     }
+  }
+
+  const handleDeleteTeam = async () => {
+    await deleteTeam({
+      param: {
+        teamId: initialData.id
+      }
+    }, {
+      onSuccess: () => {
+        router.push('/')
+      }
+    })
   }
 
   const onSubmit = async (data: UpdateTeamForm) => {
@@ -80,7 +97,7 @@ export function UpdateTeamForm ({ initialData }: UpdateTeamFormProps) {
     })
   }
 
-  const name = form.watch('name')
+  // const name = form.watch('name')
 
   return (
     <Card className='w-full h-full'>
@@ -118,7 +135,7 @@ export function UpdateTeamForm ({ initialData }: UpdateTeamFormProps) {
                             className='text-white text-3xl rounded-none bg-yellow-500'
                             onClick={() => inputRef.current?.click()}
                           >
-                            {name ? name[0].toUpperCase() : 'T'}
+                            T
                           </AvatarFallback>
                         </Avatar>
                       )}
@@ -161,7 +178,11 @@ export function UpdateTeamForm ({ initialData }: UpdateTeamFormProps) {
               <Separator />
             </div>
 
-            <div className='flex items-center justify-end gap-2'>
+            <div className='flex items-center justify-between gap-2'>
+              <DeleteTeamDialog
+                isPending={isDeletingTeam}
+                onConfirm={handleDeleteTeam}
+              />
               <Button
                 size='lg'
                 type='submit'
