@@ -29,8 +29,8 @@ export function UpdateTeamForm ({ initialData }: UpdateTeamFormProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const form = useForm<UpdateTeamForm>({
     defaultValues: {
-      name: initialData?.name,
-      image: initialData?.image as string
+      name: initialData.name ?? '',
+      image: initialData.image ?? undefined
     },
     resolver: zodResolver(updateTeamSchema)
   })
@@ -97,7 +97,7 @@ export function UpdateTeamForm ({ initialData }: UpdateTeamFormProps) {
     })
   }
 
-  // const name = form.watch('name')
+  const name = form.watch('name')
 
   return (
     <Card className='w-full h-full'>
@@ -135,7 +135,7 @@ export function UpdateTeamForm ({ initialData }: UpdateTeamFormProps) {
                             className='text-white text-3xl rounded-none bg-yellow-500'
                             onClick={() => inputRef.current?.click()}
                           >
-                            T
+                            {name ? name[0].toUpperCase() : 'T'}
                           </AvatarFallback>
                         </Avatar>
                       )}
