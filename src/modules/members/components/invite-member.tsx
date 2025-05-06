@@ -28,8 +28,7 @@ export function InviteMember({ teamId, inviteCode }: InviteMemberProps) {
   }, [teamId, inviteCode])
 
   const handleCopy = async () => {
-    console.log('Copying link:', inviteLink)
-     navigator.clipboard.writeText(inviteLink)
+    navigator.clipboard.writeText(inviteLink)
       
     toast('Link copiado com sucesso!')
   }
