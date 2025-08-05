@@ -3,6 +3,7 @@ import { sessionMiddleware } from '../auth/sessionMiddleware';
 import { zValidator } from '@hono/zod-validator';
 import { getMembersSchema } from './schemas/get-members';
 import { prisma } from '@/lib/prisma';
+import { MemberRole } from '@prisma/client';
 
 // /members?teamId=123&admin=true - Query String
 // /members/1 - Route Params
@@ -43,6 +44,59 @@ const app = new Hono()
       return c.json({
         data: members
       })
+    }
+  )
+  .delete(
+    '/:memberId',
+    sessionMiddleware,
+    async (c) => {
+      const { memberId } = c.req.param()
+      const user = c.get('user')
+
+      const memberToDelete = await prisma.member.findUnique({
+        where: {
+          id: memberId
+        }
+      })
+
+      if (!memberToDelete) {
+        return c.json({ error: 'Membro não encontrado'}, 404)
+      }
+
+      const member = await prisma.member.findFirst({
+        where: {
+          userId: user.id,
+          teamId: memberToDelete.teamId
+        }
+      })
+
+      if (!member) {
+        return c.json({ error: 'Não autorizado' }, 401)
+      }
+
+      if (member.id !== memberToDelete.id && member.role !== MemberRole.ADMIN) {
+        return c.json({ error: 'Não autorizado' }, 401) 
+      }
+
+      const allMembersInTeam = await prisma.member.findMany({
+        where: {
+          teamId: memberToDelete.teamId
+        }
+      })
+
+      if (allMembersInTeam.length === 1) {
+        return c.json({ error: 'Você não pode remover o ultimo membro do time' }, 401)
+      }
+
+      await prisma.member.delete({
+        where: {
+          id: memberId
+        }
+      })
+
+      return c.json({ data: {
+        id: memberId
+      }})
     }
   );
 
