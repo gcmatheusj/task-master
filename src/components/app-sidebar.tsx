@@ -3,6 +3,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from "./ui/side
 import { TeamsSwitcher } from "@/modules/teams/components/teams-switcher";
 import { SessionProvider } from "next-auth/react";
 import { NavUser } from "./nav-user";
+import { ProjectsNavigation } from "./projects-navigation";
 
 export function AppSidebar() {
   return (
@@ -13,6 +14,7 @@ export function AppSidebar() {
 
       <SidebarContent>
         <TeamNavigation />
+        <ProjectsNavigation />
       </SidebarContent>
 
       <SidebarFooter>
