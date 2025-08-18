@@ -11,17 +11,29 @@ import { useGetTasks } from "../hooks/use-get-tasks";
 import { useTeamId } from "@/modules/teams/hooks/use-team-id";
 import { useProjectId } from "@/modules/projects/hooks/use-project-id";
 import { Task } from '../types'
+import { useTaskFilters } from "../hooks/use-task-filters";
 
 export function TaskViewSwitcher () {
+  const [{
+    assigneeId,
+    dueDate,
+    status,
+    projectId,
+    search
+  }] = useTaskFilters()
   const teamId = useTeamId()
-  const projectId = useProjectId()
+  const paramProjectId = useProjectId()
   const [tab, setTab] = useQueryState('visualizao', {
     defaultValue: 'table'
   })
   const { open } = useCreateTaskDialog()
   const { data: tasks } = useGetTasks({
     teamId,
-    projectId
+    projectId: (paramProjectId || projectId) ?? undefined,
+    status: status ?? undefined,
+    assigneeId: assigneeId ?? undefined,
+    dueDate: dueDate ?? undefined,
+    search: search ?? undefined
   })
 
   if (!tasks?.data) {
