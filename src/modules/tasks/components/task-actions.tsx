@@ -4,6 +4,7 @@ import { useTeamId } from "@/modules/teams/hooks/use-team-id"
 import { ExternalLink, Pencil, Trash } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useDeleteTask } from "../hooks/use-delete-task"
+import { useUpdateTaskDialog } from "../hooks/use-update-task-dialog"
 
 interface TaskActionsProps {
   id: string
@@ -23,6 +24,7 @@ export function TaskActions ({
     'Tem certeza que deseja deletar essa tarefa?'
   )
   const { mutate, isPending } = useDeleteTask()
+  const { open } = useUpdateTaskDialog()
 
   const onDelete = async () => {
     const ok = await confirm()
@@ -74,6 +76,7 @@ export function TaskActions ({
           </DropdownMenuItem>
           <DropdownMenuItem
             className="font-medium p-[10px]"
+            onClick={() => open(id)}
           >
             <Pencil className='size-4 mr-2 stroke-2' />
             Editar Tarefa
