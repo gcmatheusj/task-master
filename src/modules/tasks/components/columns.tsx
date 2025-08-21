@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { TaskStatus } from "@prisma/client"
 import { TaskActions } from "./task-actions"
 
-const statusMap: Record<TaskStatus, string> = {
+export const statusMap: Record<TaskStatus, string> = {
   [TaskStatus.TODO]: "A fazer",
   [TaskStatus.IN_PROGRESS]: "Em progresso",
   [TaskStatus.IN_REVIEW]: "Em revisão",
