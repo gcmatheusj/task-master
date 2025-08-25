@@ -11,17 +11,17 @@ const routes = [
   },
   {
     label: 'Minhas Tarefas',
-    href: '/minhas-tarefas',
+    href: 'minhas-tarefas',
     icon: SquareCheckBig,
   },
   {
     label: 'Membros',
-    href: '/membros',
+    href: 'membros',
     icon: Users,
   },
   {
     label: 'Configurações',
-    href: '/configuracoes',
+    href: 'configuracoes',
     icon: Settings2,
   },
 ]

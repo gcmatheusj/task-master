@@ -1,3 +1,4 @@
+'use client'
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,7 +17,11 @@ import { DataBoard, TaskUpdate } from "./data-board";
 import { useMoveTask } from "../hooks/use-move-task";
 import { DataCalendar } from "./data-calendar";
 
-export function TaskViewSwitcher () {
+interface TaskViewSwitcherProps {
+  hideProjectFilter?: boolean
+}
+
+export function TaskViewSwitcher ({ hideProjectFilter }: TaskViewSwitcherProps) {
   const [{
     assigneeId,
     dueDate,
@@ -78,7 +83,7 @@ export function TaskViewSwitcher () {
 
         <Separator className="my-4" />
 
-        <DataFilters />
+        <DataFilters hideProjectFilter={hideProjectFilter} />
 
         <Separator className="my-4" />
 
